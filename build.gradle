@@ -1,0 +1,61 @@
+// Apply the java plugin to add support for Java
+apply plugin: 'java'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+sourceSets {
+  main {
+    java {
+      srcDir 'src/main/java'
+    }
+  }
+}
+
+/* Builds Data cleaner and training data generator */
+task datacleaner(type: Jar) {
+  from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+  }
+  manifest {
+    attributes 'Main-Class': 'com.salaryPredictor.DataCleanerDriver'
+  }
+  baseName = 'DataCleaner'
+  destinationDir = file("${rootDir}/jar")
+  with jar
+}
+
+task testfilecreator(type: Jar) {
+  from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+  }
+  manifest {
+    attributes 'Main-Class': 'com.salaryPredictor.TestFileCreator'
+  }
+  baseName = 'DataCleaner'
+  destinationDir = file("${rootDir}/jar")
+  with jar
+}
+
+/* Builds all the jar files for the project */
+task buildAll() << {
+  println 'Building All JAR Files'
+}
+
+buildAll.dependsOn 'testfilecreator','datacleaner'
+
+
+repositories {
+    mavenCentral()
+}
+
+//Project dependencies
+dependencies {
+	compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+//	compile group: 'nz.ac.waikato.cms.weka', name: 'weka-stable', version: '3.6.6'
+//	compile 'com.googlecode.matrix-toolkits-java:mtj:1.0.4'
+}
